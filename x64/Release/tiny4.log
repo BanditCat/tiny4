@@ -1,0 +1,36 @@
+﻿  cl : Command line warning D9025 : overriding '/sdl' with '/GS-'
+  main.c
+C:\Users\bcj19\source\repos\tiny4\main.c(23,45): warning C4267:  'function': conversion from 'size_t' to 'DWORD', possible loss of data
+C:\Users\bcj19\source\repos\tiny4\main.c(23,54): warning C4133:  'function': incompatible types - from 'size_t *' to 'LPDWORD'
+LINK : warning LNK4108: /ALIGN specified without /DRIVER; image may not run
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 1 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  tiny4.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Release\tiny4.exe
+   Volume in drive C is Windows
+   Volume Serial Number is C8A9-E5B1
+  
+   Directory of C:\Users\bcj19\source\repos\tiny4\x64\Release
+  
+  10/08/2019  06:48 PM    <DIR>          .
+  10/08/2019  06:48 PM    <DIR>          ..
+  10/08/2019  06:48 PM            64,347 main.obj
+  10/08/2019  06:47 PM             1,982 tdll.comp
+  10/08/2019  06:47 PM             3,632 tdll.dll
+  10/08/2019  06:47 PM             1,792 tdll.lib
+  10/08/2019  06:48 PM            13,312 tdllcompress.exe
+  10/08/2019  06:48 PM            30,778 tdllcompress.iobj
+  10/08/2019  06:48 PM            10,832 tdllcompress.ipdb
+  10/08/2019  06:48 PM           513,216 tdllcompress.pdb
+  10/08/2019  06:48 PM             1,266 tiny4.Build.CppClean.log
+  10/08/2019  06:48 PM             5,008 tiny4.exe
+  10/08/2019  06:48 PM            18,534 tiny4.iobj
+  10/08/2019  06:48 PM             7,712 tiny4.ipdb
+  10/08/2019  06:48 PM                 0 tiny4.log
+  10/08/2019  06:48 PM             2,788 tiny4.res
+  10/08/2019  06:48 PM    <DIR>          tiny4.tlog
+  10/08/2019  06:48 PM                 0 tiny4.vcxproj.FileListAbsolute.txt
+  10/08/2019  06:48 PM            86,016 vc142.pdb
+                16 File(s)        761,215 bytes
+                 3 Dir(s)  70,331,785,216 bytes free

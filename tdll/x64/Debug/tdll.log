@@ -1,0 +1,8 @@
+﻿  pch.cpp
+  dllmain.cpp
+C:\Users\bcj19\source\repos\tiny4\tdll\dllmain.cpp(54,103): warning C4273:  'setup': inconsistent dll linkage
+C:\Users\bcj19\source\repos\tiny4\tdll\tdll.h(4,39): message :  see previous definition of 'setup'
+C:\Users\bcj19\source\repos\tiny4\tdll\dllmain.cpp(140,16): warning C4273:  '_fltused': inconsistent dll linkage
+C:\Users\bcj19\source\repos\tiny4\tdll\tdll.h(3,38): message :  see previous definition of '_fltused'
+     Creating library C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.lib and object C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.exp
+  tdll.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.dll
