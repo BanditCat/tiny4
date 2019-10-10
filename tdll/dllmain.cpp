@@ -158,9 +158,7 @@ void display(void) {
 			DestroyIcon(todel);
 		}
 		
-		if (permillisecond % 300 == 0) {
-			f64 fps = framesdone / 0.3;
-			framesdone = 0;
+		if (permillisecond % 1000 == 0) {
 
 			WCHAR t = state->title[0];
 			for (u32 i = 1; i < state->titleSize; ++i)
@@ -168,9 +166,10 @@ void display(void) {
 			state->title[state->titleSize - 1] = t;
 			
 			WCHAR bigt[1200];
-			wsprintfW(bigt, L"%s - %d.%3d fps", state->title, (u32)(fps), (u32)(fmod(fps,1.0)*1000));
+			wsprintfW(bigt, L"%s - %d fps", state->title, (u32)(framesdone));
 
 			SetWindowTextW(state->hWnd, bigt);
+			framesdone = 0;
 
 		}
 		

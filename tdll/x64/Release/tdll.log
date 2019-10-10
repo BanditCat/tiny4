@@ -9,6 +9,6 @@ LINK : warning LNK4108: /ALIGN specified without /DRIVER; image may not run
   All 8 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   tdll.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Release\tdll.dll
-  Input file size: 11472; Compressed Size: 6268
+  Input file size: 11344; Compressed Size: 6194
   Compression Time(Exclude I/O): 0.00 seconds
   File Compressed.
