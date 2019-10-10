@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <compressapi.h>
+#include <limits.h>
 
 #include "resource.h"
 
@@ -47,6 +48,3 @@ typedef double f64;
 #endif 
 
 #define pi 3.1415926535897932384626433832795028841971693993751058209749445923078
-
-int _fltused = 1;
-#define memset pmemset

@@ -2,7 +2,7 @@
 
 
 
-HWND(*stp)(HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags);
+HWND(*stp)(HMODULE, HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags);
 
 
 int APIENTRY
@@ -20,15 +20,19 @@ m(void)
 	Decompress(Decompressor,resp,sz,NULL,0,&unsize); 
 	u8* uncomp = GlobalAlloc(0, unsize);
 	Decompress(Decompressor, resp, sz, uncomp, unsize, &unsize2);
-	WriteFile(DecompressedFile, uncomp, unsize2, &unsize, NULL);
+	WriteFile(DecompressedFile, uncomp, (DWORD)unsize2, (LPDWORD)&unsize, NULL);
 
 	CloseHandle(DecompressedFile);
+	GlobalFree(uncomp);
 
 	HMODULE ll = LoadLibraryA("friendly");
-	stp = (HWND(*)(HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags))GetProcAddress(ll, (LPCSTR)2);
+	// DLL must free library and Icon.
+	stp = (HWND(*)(HMODULE ll, HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags))GetProcAddress(ll, (LPCSTR)2);
 
-	stp(LoadIconA(GetModuleHandle(NULL),(LPCSTR)IDI_ICON1),GetModuleHandle(NULL),"minimal", 0, 0, 256, 256, PFD_TYPE_RGBA, 0);
-
-
+	stp(ll,LoadIconA(GetModuleHandle(NULL),(LPCSTR)IDI_ICON1),GetModuleHandle(NULL),"LaserPixels ", 100, 100, 640, 480, PFD_TYPE_RGBA, 0);
+	
 	return 42;
 }
+
+
+int _fltused = 1;

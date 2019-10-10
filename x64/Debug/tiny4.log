@@ -1,0 +1,30 @@
+﻿  tiny4.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Debug\tiny4.exe
+   Volume in drive C is Windows
+   Volume Serial Number is C8A9-E5B1
+  
+   Directory of C:\Users\bcj19\source\repos\tiny4\x64\Debug
+  
+  10/09/2019  09:22 PM    <DIR>          .
+  10/09/2019  09:22 PM    <DIR>          ..
+  10/09/2019  09:21 PM            20,209 main.obj
+  10/09/2019  09:22 PM            13,572 tdll.comp
+  10/09/2019  09:22 PM            66,048 tdll.dll
+  10/09/2019  09:22 PM               799 tdll.exp
+  10/09/2019  09:22 PM           442,424 tdll.ilk
+  10/09/2019  09:22 PM             1,792 tdll.lib
+  10/09/2019  09:22 PM           577,536 tdll.pdb
+  10/09/2019  09:21 PM            64,512 tdllcompress.exe
+  10/09/2019  09:21 PM           424,156 tdllcompress.ilk
+  10/09/2019  09:21 PM           462,848 tdllcompress.pdb
+  10/09/2019  09:21 PM             1,203 tiny4.Build.CppClean.log
+  10/09/2019  09:22 PM            64,512 tiny4.exe
+  10/09/2019  09:22 PM           259,456 tiny4.ilk
+  10/09/2019  09:22 PM                 0 tiny4.log
+  10/09/2019  09:22 PM           356,352 tiny4.pdb
+  10/09/2019  09:22 PM            14,376 tiny4.res
+  10/09/2019  09:22 PM    <DIR>          tiny4.tlog
+  10/09/2019  09:21 PM                 0 tiny4.vcxproj.FileListAbsolute.txt
+  10/09/2019  09:21 PM           224,256 vc142.idb
+  10/09/2019  09:21 PM           102,400 vc142.pdb
+                19 File(s)      3,096,451 bytes
+                 3 Dir(s)  69,892,108,288 bytes free
