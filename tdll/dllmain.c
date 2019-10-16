@@ -1,17 +1,9 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "tdll.h"
 
-
-#define IconSize 32
-
-
-
-gstate *state = NULL;
-
-
-void mexit(void);
+// MALLOC MUST GO FIRST!
 void* pmalloc(size_t sz) {
-	void* ret = (void*)GlobalAlloc(0, sz);
+	void* ret = (void*)GlobalAlloc(GPTR, sz);
 	if (ret == NULL)
 		mexit();
 	return ret;
@@ -21,6 +13,45 @@ void pfree(void* p) {
 	GlobalFree(p);
 }
 #define free pfree
+
+#define IconSize 32
+
+
+
+gstate *state = NULL;
+
+
+void mexit(void);
+void matexit(void(*func)(void*), void* arg) {
+	state->_exitCallbacks[state->_numExitCallbacks] = func;
+	state->_exitArgs[state->_numExitCallbacks] = arg;
+	state->_numExitCallbacks++;
+	// Test power of 2
+	u32 tst = state->_numExitCallbacks;
+	while (!(tst & 1))
+		tst >>= 1;
+	// Remalloc if power of 2
+	if (tst == 1) {
+		void(**nfuncs)(void*) = malloc(sizeof(void(**)(void*)) * state->_numExitCallbacks * 2);
+		void** nargs = malloc(sizeof(void*) * state->_numExitCallbacks * 2);
+		memcpy(nfuncs, state->_exitCallbacks, sizeof(void(**)(void*)) * state->_numExitCallbacks);
+		memcpy(nargs, state->_exitArgs, sizeof(void*) * state->_numExitCallbacks);
+		free(state->_exitCallbacks); state->_exitCallbacks = nfuncs;
+		free(state->_exitArgs); state->_exitArgs = nargs;
+	}
+}
+
+void delProgram(void* arg) {
+	GLuint todel = (GLuint)arg;
+	glDeleteProgram(todel);
+	printf("delp %d", todel);
+}
+void delTexture(void* arg) {
+	GLuint todel = (GLuint)arg;
+	glDeleteTextures(1, &todel);
+	printf("delt %d", todel);
+}
+
 
 u64 nmrand = 0;
 
@@ -41,7 +72,6 @@ void enter(void) {
 		}
 		state->_keys = state->_ks1;
 		state->_keysOld = state->_ks2;
-		state->_tobreak = 0;
 
 		state->iconABits = (u8*)malloc(IconSize * IconSize);
 		state->iconXBits = (u8*)malloc(IconSize * IconSize * 4);
@@ -71,10 +101,9 @@ void enter(void) {
 
 			}
 	}
-	genter(state);
 }
 void mexit(void) {
-	state->_tobreak = 1;
+	longjmp(*(state->_exit), 1);
 }
 void tick(void) {
 	// Input
@@ -225,17 +254,23 @@ LONG WINAPI eventLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 
 	case WM_CLOSE:
-		mexit();
+		state->_tobreak = 1;
 		return 0;
 	}
 
 	return (LONG)DefWindowProc(hWnd, uMsg, wParam, lParam);
-}
+ }
 
-__declspec(dllexport) HWND setup(HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags) {
+__declspec(dllexport) HWND setup(HMODULE ll, HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags) {
 	enter();
 	state->hInstance = hinst;
+	state->ll = ll;
 	state->fullscreen = 0;
+	state->_numExitCallbacks = 0;
+	state->_exitCallbacks = malloc(sizeof(void (*)(void*)));
+	state->_exitArgs = malloc(sizeof(void*));
+	state->_tobreak = 0;
+
 	state->wc.style = CS_OWNDC;
 	state->wc.lpfnWndProc = (WNDPROC)eventLoop;
 	state->wc.cbClsExtra = 0;
@@ -273,39 +308,102 @@ __declspec(dllexport) HWND setup(HICON hi, HINSTANCE hinst, char* title, int x, 
 
 	ReleaseDC(state->hWnd, state->hDC);
 
-		
+
 
 	state->hDC = GetDC(state->hWnd);
 	state->hRC = wglCreateContext(state->hDC);
 	wglMakeCurrent(state->hDC, state->hRC);
 
-	BOOL(*pfunc)(int) = (BOOL (*)(int))wglGetProcAddress("wglSwapIntervalEXT");
-	pfunc(1);
 
 	ShowWindow(state->hWnd, SW_SHOW);
 
-	while (1) {
+	// Load gl before calling genter
+	loadGl(PFNGLACTIVETEXTUREPROC, glActiveTexture);
+	loadGl(PFNGLBINDIMAGETEXTUREPROC, glBindImageTexture);
+	loadGl(PFNWGLSWAPINTERVALEXTPROC, wglSwapIntervalEXT);
+	loadGl(PFNGLGETINTEGERI_VPROC, glGetIntegeri_v);
+	loadGl(PFNGLCREATESHADERPROC, glCreateShader);
+	loadGl(PFNGLCREATEPROGRAMPROC, glCreateProgram);
+	loadGl(PFNGLSHADERSOURCEPROC, glShaderSource);
+	loadGl(PFNGLCOMPILESHADERPROC, glCompileShader);
+	loadGl(PFNGLGETSHADERIVPROC, glGetShaderiv);
+	loadGl(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
+	loadGl(PFNGLATTACHSHADERPROC, glAttachShader);
+	loadGl(PFNGLLINKPROGRAMPROC, glLinkProgram);
+	loadGl(PFNGLGETPROGRAMIVPROC, glGetProgramiv);
+	loadGl(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog);
+	loadGl(PFNGLUSEPROGRAMPROC, glUseProgram);
+	loadGl(PFNGLDISPATCHCOMPUTEPROC, glDispatchCompute);
+	loadGl(PFNGLGETTEXTURESUBIMAGEPROC, glGetTextureSubImage);
+	loadGl(PFNGLUNIFORM1FPROC, glUniform1f);
+	loadGl(PFNGLUNIFORM1IPROC, glUniform1i);
+	loadGl(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
+	loadGl(PFNGLDELETESHADERPROC, glDeleteShader);
+	loadGl(PFNGLDELETEPROGRAMPROC, glDeleteProgram);
+
+
+	// GL info
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &state->workGroupCount[0]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &state->workGroupCount[1]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &state->workGroupCount[2]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &state->workGroupSize[0]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &state->workGroupSize[1]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &state->workGroupSize[2]);
+	glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &state->workGroupInvokations);
+
+	// VSYNC!!!!!
+	wglSwapIntervalEXT(1);
+
+	// Now actually enter.
+	jmp_buf jenv;
+	static u32 exits = 0;
+	int val = setjmp(jenv);
+	exits++;
+	if (!val) {
+		state->_exit = &jenv;
+		state->rendererString = glGetString(GL_RENDERER);
+		genter(state);
+	}
+
+	while (!val) {
 		while (PeekMessage(&state->msg, state->hWnd, 0, 0, PM_NOREMOVE)) {
 			if (GetMessage(&state->msg, state->hWnd, 0, 0)) {
 				TranslateMessage(&state->msg);
 				DispatchMessageW(&state->msg);
 			}
+			if (state->_tobreak)
+				mexit();
 		}
 		display();
-		if (state->_tobreak)
-			break;
+		checkGlErrors("Main loop");
 	}
-	gexit(state);
+	if (exits == 2) {
+		gexit(state);
+		for (u32 i = 0; i < state->_numExitCallbacks; ++i) {
+			state->_exitCallbacks[i](state->_exitArgs[i]);
+		}
+	}		
 	wglMakeCurrent(NULL, NULL);
 	ReleaseDC(state->hWnd, state->hDC);
 	wglDeleteContext(state->hRC);
 	DestroyWindow(state->hWnd);
+	// Why no free?
 	//free(state->iconXBits);
 	//free(state->iconABits);
 	DestroyIcon(state->wc.hIcon);
+	free(state->_exitArgs);
+	free(state->_exitCallbacks);
 	free(state);
 	return NULL;
 }
+
+
+const u8* getResource(u32 id) {
+	HRSRC h = FindResourceExA(state->ll, "MISC", MAKEINTRESOURCEA(id), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
+	HGLOBAL hg = LoadResource(state->ll, h);
+	return (const u8*)LockResource(hg);
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved ){
     switch (ul_reason_for_call){
     case DLL_PROCESS_ATTACH:
@@ -320,3 +418,111 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
     return TRUE;
 }
 
+
+GLuint compileComputeShader(const u8* src ) {
+	GLuint ret = glCreateProgram();
+	matexit(delProgram, (void*)ret);
+	GLuint shad = glCreateShader(GL_COMPUTE_SHADER);
+	glShaderSource(shad, 1, &src, NULL);
+	glCompileShader(shad);
+#ifdef _DEBUG
+	int rvalue;
+	glGetShaderiv(shad, GL_COMPILE_STATUS, &rvalue);
+	if (!rvalue) {
+		GLchar log[10240];
+		GLsizei length;
+		glGetShaderInfoLog(shad, 10220, &length, log);
+		printf("Error! Compiler log:\n%s\n", log);
+		mexit();
+	}
+#endif
+	glAttachShader(ret, shad);
+
+	glLinkProgram(ret);
+#ifdef _DEBUG
+	glGetProgramiv(ret, GL_LINK_STATUS, &rvalue);
+	if (!rvalue) {
+		GLchar log[10240];
+		GLsizei length;
+		glGetProgramInfoLog(ret, 10239, &length, log);
+		printf("Error! Linker log:\n%s\n", log);
+		mexit();
+	}
+#endif
+	glDeleteShader(shad);
+	return ret;
+}
+
+GLuint compilePipeline(const u8* src) {
+	const u8* vert = strstr(src, "#VERTEX") + 7;
+	const u8* geom = strstr(vert, "#GEOMETRY");
+	u32 vertlen = (u32)(geom - vert);
+	printf("%s", geom);
+	geom += 9;
+	const u8* frag = strstr(geom, "#FRAGMENT");
+	u32 geomlen = (u32)(frag - geom);
+	frag += 9;
+	u32 fraglen = (u32)strlen(frag);
+
+	GLuint ret = glCreateProgram();
+	matexit(delProgram, (void*)ret);
+
+	GLuint shads[3];
+	GLenum types[3] = { GL_GEOMETRY_SHADER, GL_VERTEX_SHADER, GL_FRAGMENT_SHADER };
+#ifdef _DEBUG
+	const u8* typess[3] = { "GL_GEOMETRY_SHADER", "GL_VERTEX_SHADER", "GL_FRAGMENT_SHADER" };
+	int rvalue;
+#endif
+	const u8* srcs[3] = { geom,vert,frag };
+	u32 szs[3] = { geomlen,vertlen,fraglen };
+
+	
+	for(u32 i = 0; i < 3; ++i){
+		shads[i] = glCreateShader(types[i]);
+		glShaderSource(shads[i], 1, &(srcs[i]), &(szs[i]));
+		glCompileShader(shads[i]);
+#ifdef _DEBUG
+		glGetShaderiv(shads[i], GL_COMPILE_STATUS, &rvalue);
+		if (!rvalue) {
+			GLchar log[10240];
+			GLsizei length;
+			glGetShaderInfoLog(shads[i], 10220, &length, log);
+			printf("Error! Compiler %s log:\n%s\n", typess[i], log);
+			mexit();
+		}
+#endif
+		glAttachShader(ret, shads[i]);
+	}
+
+	glLinkProgram(ret);
+#ifdef _DEBUG
+	glGetProgramiv(ret, GL_LINK_STATUS, &rvalue);
+	if (!rvalue) {
+		GLchar log[10240];
+		GLsizei length;
+		glGetProgramInfoLog(ret, 10239, &length, log);
+		printf("Error! Linker log:\n%s\n", log);
+		mexit();
+	}
+#endif
+	for( u32 i = 0; i < 3; ++i)
+	  glDeleteShader(shads[i]);
+
+	return ret;
+}
+GLuint makeTax(u32 w, u32 h, GLint mip, GLenum format, GLenum type) {
+	GLuint ret;
+	glGenTextures(1, &ret);
+	matexit(delTexture,(void*)ret);
+	glActiveTexture(GL_TEXTURE0);
+
+	glBindTexture(GL_TEXTURE_2D, ret);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	if (mip == GL_LINEAR) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, format, type, NULL);
+	return ret;
+}

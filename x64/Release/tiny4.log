@@ -1,8 +1,10 @@
-﻿LINK : warning LNK4108: /ALIGN specified without /DRIVER; image may not run
+﻿  main.c
+cl : command line warning D9025: overriding '/sdl' with '/GS-'
+LINK : warning LNK4108: /ALIGN specified without /DRIVER; image may not run
+     Creating library C:\Users\bcj19\source\repos\tiny4\x64\Release\tiny4.lib and object C:\Users\bcj19\source\repos\tiny4\x64\Release\tiny4.exp
   Generating code
-  0 of 1 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  Previous IPDB not found, fall back to full compilation.
+  All 1 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   tiny4.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Release\tiny4.exe
    Volume in drive C is Windows
@@ -10,24 +12,23 @@
   
    Directory of C:\Users\bcj19\source\repos\tiny4\x64\Release
   
-  10/10/2019  01:45 PM    <DIR>          .
-  10/10/2019  01:45 PM    <DIR>          ..
-  10/10/2019  01:45 PM            65,167 main.obj
-  10/10/2019  01:45 PM             6,754 tdll.comp
-  10/10/2019  01:45 PM            12,224 tdll.dll
-  10/10/2019  01:44 PM             1,792 tdll.lib
-  10/10/2019  01:45 PM            13,312 tdllcompress.exe
-  10/10/2019  01:45 PM            30,778 tdllcompress.iobj
-  10/10/2019  01:45 PM            10,832 tdllcompress.ipdb
-  10/10/2019  01:45 PM           446,464 tdllcompress.pdb
-  10/10/2019  01:45 PM             1,460 tiny4.Build.CppClean.log
-  10/10/2019  01:45 PM            10,032 tiny4.exe
-  10/10/2019  01:45 PM            19,518 tiny4.iobj
-  10/10/2019  01:45 PM             9,808 tiny4.ipdb
-  10/10/2019  01:45 PM                 0 tiny4.log
-  10/10/2019  01:45 PM             7,560 tiny4.res
-  10/10/2019  01:45 PM    <DIR>          tiny4.tlog
-  10/10/2019  01:45 PM                 0 tiny4.vcxproj.FileListAbsolute.txt
-  10/10/2019  01:45 PM            86,016 vc142.pdb
-                16 File(s)        721,717 bytes
-                 3 Dir(s)  75,127,726,080 bytes free
+  10/16/2019  09:28 AM    <DIR>          .
+  10/16/2019  09:28 AM    <DIR>          ..
+  10/16/2019  09:28 AM            65,333 main.obj
+  10/16/2019  09:28 AM             8,768 tdll.comp
+  10/16/2019  09:28 AM            16,832 tdll.dll
+  10/16/2019  08:32 AM             1,792 tdll.lib
+  10/16/2019  09:28 AM            13,312 tdllcompress.exe
+  10/16/2019  09:28 AM             1,574 tiny4.Build.CppClean.log
+  10/16/2019  09:28 AM            12,192 tiny4.exe
+  10/16/2019  09:28 AM               754 tiny4.exp
+  10/16/2019  09:28 AM            19,650 tiny4.iobj
+  10/16/2019  09:28 AM            10,352 tiny4.ipdb
+  10/16/2019  09:28 AM             1,686 tiny4.lib
+  10/16/2019  09:28 AM                 0 tiny4.log
+  10/16/2019  09:28 AM             9,588 tiny4.res
+  10/16/2019  09:28 AM    <DIR>          tiny4.tlog
+  10/16/2019  09:28 AM                 0 tiny4.vcxproj.FileListAbsolute.txt
+  10/16/2019  09:28 AM            86,016 vc142.pdb
+                15 File(s)        247,849 bytes
+                 3 Dir(s)  71,836,028,928 bytes free

@@ -2,7 +2,7 @@
 
 
 
-HWND(*stp)(HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags);
+HWND(*stp)(HMODULE ll, HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags);
 
 
 int APIENTRY m(void){
@@ -44,14 +44,16 @@ int APIENTRY m(void){
 #endif
 
 	// DLL must free Icon.
-	stp = (HWND(*)( HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags))GetProcAddress(ll, (LPCSTR)2);
-
-	stp(LoadIconA(GetModuleHandle(NULL),(LPCSTR)IDI_ICON1),GetModuleHandle(NULL),"LaserPixels ", 100, 100, 640, 480, PFD_TYPE_RGBA, 0);
+	stp = (HWND(*)(HMODULE, HICON hi, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags))GetProcAddress(ll, (LPCSTR)2);
+	stp(ll,LoadIconA(GetModuleHandle(NULL),(LPCSTR)IDI_ICON1),GetModuleHandle(NULL),"LaserPixels ", 100, 100, 640, 480, PFD_TYPE_RGBA, 0);
 	FreeLibrary(ll);
 	DeleteFileA(tfp);
 	GlobalFree(tfp);
 	ExitProcess(0);
 }
+
+
+_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 
 
 int _fltused = 1;

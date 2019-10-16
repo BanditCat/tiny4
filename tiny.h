@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <compressapi.h>
 #include <limits.h>
+#include <setjmp.h>
 
 #include "resource.h"
 
