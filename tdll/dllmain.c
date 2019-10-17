@@ -44,12 +44,14 @@ void matexit(void(*func)(void*), void* arg) {
 void delProgram(void* arg) {
 	GLuint todel = (GLuint)arg;
 	glDeleteProgram(todel);
-	printf("delp %d", todel);
 }
 void delTexture(void* arg) {
 	GLuint todel = (GLuint)arg;
 	glDeleteTextures(1, &todel);
-	printf("delt %d", todel);
+}
+void delBuffer(void* arg) {
+	GLuint todel = (GLuint)arg;
+	glDeleteBuffers(1, &todel);
 }
 
 
@@ -66,6 +68,7 @@ u32 mrand(void) {
 void enter(void) {
 	if (state == NULL) {
 		state = (gstate*)malloc(sizeof(gstate));
+		state->started = 0;
 		for (u32 i = 0; i < 256; ++i) {
 			state->_ks1[i] = state->_ks2[i] = 0;
 			state->keys[i] = state->keysReleased[i] = state->keysPressed[i] = 0;
@@ -132,79 +135,80 @@ void tick(void) {
 	
 }
 void display(void) {
-	{
-		// Update time.
-		LARGE_INTEGER pc, pf;
+	if (state->started) {
+		{
+			// Update time.
+			LARGE_INTEGER pc, pf;
 
-		QueryPerformanceCounter(&pc);
-		QueryPerformanceFrequency(&pf);
-		u64 newval = ((pc.QuadPart - state->_pcBase) * 1000000) / pf.QuadPart;
-		if (newval != state->useconds) {
-			state->usecondDelta = newval - state->useconds;
-			state->useconds = newval;
-			state->seconds = state->useconds / 1000000.0;
-			state->secondDelta = state->usecondDelta / 1000000.0;
+			QueryPerformanceCounter(&pc);
+			QueryPerformanceFrequency(&pf);
+			u64 newval = ((pc.QuadPart - state->_pcBase) * 1000000) / pf.QuadPart;
+			if (newval != state->useconds) {
+				state->usecondDelta = newval - state->useconds;
+				state->useconds = newval;
+				state->seconds = state->useconds / 1000000.0;
+				state->secondDelta = state->usecondDelta / 1000000.0;
+			}
 		}
-	}
 
-	static u32 framesdone = 0;
-	static u64 permillisecond = 0;
-	while( permillisecond < (state->useconds / 1000)){
-		if (permillisecond % 10 == 0) {
-			static u64 rval = 0;
-			for (int i = 0; i < 100; ++i) {
-				int x2 = mrand() % IconSize;
-				int y = mrand() % (IconSize - 1);
-				int x = (x2 - 1) + (mrand() % 3);
-				int y2 = y + 1;
-				int addr = (x + y * IconSize) * 4;
-				int addr2 = (x2 + y2 * IconSize) * 4;
-				int c = state->iconXBits[addr2 + 1] - mrand() % 19;
-				if (c < 0)
-					c = 0;
+		static u32 framesdone = 0;
+		static u64 permillisecond = 0;
+		while (permillisecond < (state->useconds / 1000)) {
+			if (permillisecond % 10 == 0) {
+				static u64 rval = 0;
+				for (int i = 0; i < 100; ++i) {
+					int x2 = mrand() % IconSize;
+					int y = mrand() % (IconSize - 1);
+					int x = (x2 - 1) + (mrand() % 3);
+					int y2 = y + 1;
+					int addr = (x + y * IconSize) * 4;
+					int addr2 = (x2 + y2 * IconSize) * 4;
+					int c = state->iconXBits[addr2 + 1] - mrand() % 19;
+					if (c < 0)
+						c = 0;
 
-				state->iconXBits[addr + 1] = c;
-				state->iconXBits[addr + 0] = c / 2;
+					state->iconXBits[addr + 1] = c;
+					state->iconXBits[addr + 0] = c / 2;
+				}
+
+				HICON todel = state->wc.hIcon;
+				state->wc.hIcon = CreateIcon(NULL, IconSize, IconSize, 4, 8, state->iconABits, state->iconXBits);
+				SendMessage(state->hWnd, WM_SETICON, ICON_SMALL, (LPARAM)state->wc.hIcon);
+				DestroyIcon(todel);
 			}
 
-			HICON todel = state->wc.hIcon;
-			state->wc.hIcon = CreateIcon(NULL, IconSize, IconSize, 4, 8, state->iconABits, state->iconXBits);
-			SendMessage(state->hWnd, WM_SETICON, ICON_SMALL, (LPARAM)state->wc.hIcon);
-			DestroyIcon(todel);
-		}
-		
-		if (permillisecond % 250 == 0) {
+			if (permillisecond % 250 == 0) {
 
-			WCHAR t = state->title[0];
-			for (u32 i = 1; i < state->titleSize; ++i)
-				state->title[i - 1] = state->title[i];
-			state->title[state->titleSize - 1] = t;
+				WCHAR t = state->title[0];
+				for (u32 i = 1; i < state->titleSize; ++i)
+					state->title[i - 1] = state->title[i];
+				state->title[state->titleSize - 1] = t;
 
-			WCHAR* bigt = (WCHAR*)malloc(2050);
-			static u32 pframesdone = 0;
-			wsprintfW(bigt, L"%s - %d fps", state->title, pframesdone);
-			SetWindowTextW(state->hWnd, bigt);
-			free(bigt);
-			if (permillisecond % 1000 == 0) {
-				pframesdone = framesdone;
-				framesdone = 0;
+				WCHAR* bigt = (WCHAR*)malloc(2050);
+				static u32 pframesdone = 0;
+				wsprintfW(bigt, L"%s - %d fps", state->title, pframesdone);
+				SetWindowTextW(state->hWnd, bigt);
+				free(bigt);
+				if (permillisecond % 1000 == 0) {
+					pframesdone = framesdone;
+					framesdone = 0;
+				}
+
+
 			}
 
-
+			++permillisecond;
 		}
-		
-		++permillisecond;
+		++framesdone;
+
+		// Draw
+		gdisplay(state);
+
+		tick();
+		glFlush();
+		SwapBuffers(state->hDC);
 	}
-	++framesdone;
-
-	// Draw
-	gdisplay(state);
-
-	tick();
-	glFlush();
-	SwapBuffers(state->hDC);
 }
-
 
 LONG WINAPI eventLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	static PAINTSTRUCT ps;
@@ -218,8 +222,8 @@ LONG WINAPI eventLoop(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 	case WM_SIZE:
 		if (!state->fullscreen) {
-			state->width = LOWORD(lParam);
-			state->height = HIWORD(lParam);
+			state->clientWidth = state->width = LOWORD(lParam);
+			state->clientHeight = state->height = HIWORD(lParam);
 			RECT r;
 			r.left = state->x;
 			r.top = state->y;
@@ -266,6 +270,8 @@ __declspec(dllexport) HWND setup(HMODULE ll, HICON hi, HINSTANCE hinst, char* ti
 	state->hInstance = hinst;
 	state->ll = ll;
 	state->fullscreen = 0;
+	state->screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	state->screenHeight = GetSystemMetrics(SM_CYSCREEN);
 	state->_numExitCallbacks = 0;
 	state->_exitCallbacks = malloc(sizeof(void (*)(void*)));
 	state->_exitArgs = malloc(sizeof(void*));
@@ -336,10 +342,23 @@ __declspec(dllexport) HWND setup(HMODULE ll, HICON hi, HINSTANCE hinst, char* ti
 	loadGl(PFNGLDISPATCHCOMPUTEPROC, glDispatchCompute);
 	loadGl(PFNGLGETTEXTURESUBIMAGEPROC, glGetTextureSubImage);
 	loadGl(PFNGLUNIFORM1FPROC, glUniform1f);
+	loadGl(PFNGLUNIFORM4FPROC, glUniform4f);
+	loadGl(PFNGLUNIFORM1FVPROC, glUniform1fv);
+	loadGl(PFNGLUNIFORM4FVPROC, glUniform4fv);
 	loadGl(PFNGLUNIFORM1IPROC, glUniform1i);
+	loadGl(PFNGLUNIFORM4IPROC, glUniform4i);
+	loadGl(PFNGLUNIFORM1IVPROC, glUniform1iv);
+	loadGl(PFNGLUNIFORM4IVPROC, glUniform4iv);
 	loadGl(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
 	loadGl(PFNGLDELETESHADERPROC, glDeleteShader);
 	loadGl(PFNGLDELETEPROGRAMPROC, glDeleteProgram);
+	loadGl(PFNGLVERTEXATTRIBPOINTERARBPROC, glVertexAttribPointer);
+	loadGl(PFNGLENABLEVERTEXATTRIBARRAYARBPROC, glEnableVertexAttribArray);
+	loadGl(PFNGLGENBUFFERSPROC, glGenBuffers);
+	loadGl(PFNGLBINDBUFFERPROC, glBindBuffer);
+	loadGl(PFNGLBUFFERDATAPROC, glBufferData);
+	loadGl(PFNGLDELETEBUFFERSPROC, glDeleteBuffers );
+
 
 
 	// GL info
@@ -363,6 +382,7 @@ __declspec(dllexport) HWND setup(HMODULE ll, HICON hi, HINSTANCE hinst, char* ti
 		state->_exit = &jenv;
 		state->rendererString = glGetString(GL_RENDERER);
 		genter(state);
+		state->started = 1;
 	}
 
 	while (!val) {
@@ -398,9 +418,11 @@ __declspec(dllexport) HWND setup(HMODULE ll, HICON hi, HINSTANCE hinst, char* ti
 }
 
 
-const u8* getResource(u32 id) {
+const u8* getResource(u32 id, u32* sz) {
 	HRSRC h = FindResourceExA(state->ll, "MISC", MAKEINTRESOURCEA(id), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL));
 	HGLOBAL hg = LoadResource(state->ll, h);
+	if( sz != NULL )
+		*sz =SizeofResource(state->ll, h);
 	return (const u8*)LockResource(hg);
 }
 
@@ -419,11 +441,11 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 }
 
 
-GLuint compileComputeShader(const u8* src ) {
+GLuint compileComputeShader(const u8* src, u32 sz) {
 	GLuint ret = glCreateProgram();
 	matexit(delProgram, (void*)ret);
 	GLuint shad = glCreateShader(GL_COMPUTE_SHADER);
-	glShaderSource(shad, 1, &src, NULL);
+	glShaderSource(shad, 1, &src, &sz);
 	glCompileShader(shad);
 #ifdef _DEBUG
 	int rvalue;
@@ -450,10 +472,11 @@ GLuint compileComputeShader(const u8* src ) {
 	}
 #endif
 	glDeleteShader(shad);
+	checkGlErrors("compileComputeShader");
 	return ret;
 }
 
-GLuint compilePipeline(const u8* src) {
+GLuint compilePipeline(const u8* src, u32 sz) {
 	const u8* vert = strstr(src, "#VERTEX") + 7;
 	const u8* geom = strstr(vert, "#GEOMETRY");
 	u32 vertlen = (u32)(geom - vert);
@@ -462,8 +485,7 @@ GLuint compilePipeline(const u8* src) {
 	const u8* frag = strstr(geom, "#FRAGMENT");
 	u32 geomlen = (u32)(frag - geom);
 	frag += 9;
-	u32 fraglen = (u32)strlen(frag);
-
+	u32 fraglen = sz - (25 + geomlen + vertlen);
 	GLuint ret = glCreateProgram();
 	matexit(delProgram, (void*)ret);
 
@@ -507,7 +529,7 @@ GLuint compilePipeline(const u8* src) {
 #endif
 	for( u32 i = 0; i < 3; ++i)
 	  glDeleteShader(shads[i]);
-
+	checkGlErrors("compilePipeline");
 	return ret;
 }
 GLuint makeTax(u32 w, u32 h, GLint mip, GLenum format, GLenum type) {
@@ -519,9 +541,9 @@ GLuint makeTax(u32 w, u32 h, GLint mip, GLenum format, GLenum type) {
 	glBindTexture(GL_TEXTURE_2D, ret);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	if (mip == GL_LINEAR) {
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	if (mip == GL_LINEAR||mip == GL_NEAREST) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mip);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mip);
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, format, type, NULL);
 	return ret;

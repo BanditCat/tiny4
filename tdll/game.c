@@ -4,33 +4,46 @@
 typedef struct {
 	GLuint screenTex;
 	GLuint pipeline;
+	GLuint quadBuf;
+	GLuint compute;
+	u32 stWidth, stHeight;
 } sgame;
 sgame game;
 
 void genter(gstate* state) {
 	// dimensions of the image
-	int tex_w = 256, tex_h = 256;
 
 	checkGlErrors("sab");
-	game.screenTex = makeTax(tex_w, tex_h, GL_LINEAR, GL_RGBA, GL_FLOAT);
+	game.stWidth = state->screenWidth + 32;
+	game.stHeight = state->screenHeight + 32;
+	game.screenTex = makeTax(game.stWidth, game.stHeight, GL_NEAREST, GL_RGBA, GL_FLOAT);
 	checkGlErrors("ww22222b");
 	glBindImageTexture(2, game.screenTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 
 	checkGlErrors("ascdb");
 
+	u32 sz;
+	const u8* src = getResource(ID_COMPUTE_SHADER, &sz);
+	game.compute = compileComputeShader(src,sz);
+	glUseProgram(game.compute);
+	glUniform1i(0, 2);
+	GLuint font[2] = { 1414812680, 60 };
+	glUniform1iv(2,2,font);
 
-	GLuint prog = compileComputeShader(getResource(ID_COMPUTE_SHADER));
-	glUseProgram(prog);
-	checkGlErrors("b");
-	glUniform1i(glGetUniformLocation(prog, "destTex"), 2);
-	checkGlErrors("after");
-	glDispatchCompute(1, 256, 1);
-	checkGlErrors("after2");
-	float ret[4];	glGetTextureSubImage(game.screenTex, 0, 10, 0, 0, 1, 1, 1, GL_RGBA, GL_FLOAT, 16, ret);
-	checkGlErrors("aftersd2");
-	printf("%d %d %d %d is a bignummmmmmm", (int)(ret[0] * 1000), (int)(ret[1] * 1000), (int)(ret[2] * 1000), (int)(ret[3] * 1000));
+	src = getResource(ID_PIPELINE, &sz);
+	game.pipeline = compilePipeline(src,sz);
 
-	game.pipeline = compilePipeline(getResource(ID_PIPELINE));
+
+	float arr[] = { -1.0,-1.0,0.0,1.0,
+					1.0,-1.0,0.0,1.0,
+                    -1.0,1.0,0.0,1.0,
+					1.0, 1.0,0.0,1.0};
+	glGenBuffers(1, &game.quadBuf);
+	matexit(delBuffer, (void*)game.quadBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, game.quadBuf);
+	glBufferData(GL_ARRAY_BUFFER, 64, arr, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 }
 void gexit(gstate* state) {
 
@@ -50,21 +63,23 @@ void gtick(gstate*state) {
 		else {
 			state->fullscreen = 1;
 			SetWindowLongPtrW(state->hWnd, GWL_STYLE, WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-			SetWindowPos(state->hWnd, HWND_TOPMOST, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
+			state->clientWidth = GetSystemMetrics(SM_CXSCREEN);
+			state->clientHeight = GetSystemMetrics(SM_CYSCREEN);
+			SetWindowPos(state->hWnd, HWND_TOPMOST, 0, 0, state->clientWidth, state->clientHeight, 0);
 			ShowWindow(state->hWnd, SW_SHOW);
 		}
 	}
 }
 void gdisplay(gstate* state) {
-	glUseProgram(game.pipeline);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f((f32)sin(state->seconds * 10), (f32)cos(state->seconds * 10), 0);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(-1, -1, 0);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(1, -1, 0);
-	glEnd();
-}
+	glUseProgram(game.compute);
+	u32 tilesX = state->clientWidth / 32 + 1;
+	u32 tilesY = state->clientHeight / 32 + 1;
+	glUniform4f(1, state->clientWidth, state->clientHeight, (float)state->clientWidth / game.stWidth, (float)state->clientHeight / game.stHeight);
+	glDispatchCompute(tilesX , tilesY, 1);
+	glUseProgram(game.pipeline);
+	glUniform4f(4, state->clientWidth, state->clientHeight, (float)state->clientWidth / game.stWidth, (float)state->clientHeight / game.stHeight);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+ }
+
 

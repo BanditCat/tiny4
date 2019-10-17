@@ -27,12 +27,13 @@ __declspec(dllexport) HWND setup(HMODULE, HICON, HINSTANCE hinst, char* title, i
 
 
 void mexit(void);
-const u8* getResource( u32 id );
+const u8* getResource( u32 id, u32* sz );
 
 
 typedef struct gstate {
 	// Wininfo
-	s32 width, height, x, y;
+	s32 x, y;
+	u32 width, height, clientWidth, clientHeight, screenWidth, screenHeight;
 	int fullscreen;
 	HINSTANCE hInstance;
 	WNDCLASSW wc;
@@ -42,6 +43,9 @@ typedef struct gstate {
 	HMODULE ll;
 	int pf;
 	PIXELFORMATDESCRIPTOR pfd;
+
+	// Set to 1 after genter
+	int started;
 
 	// GL info
 	const u8* rendererString;
@@ -86,6 +90,9 @@ typedef struct gstate {
 } gstate;
 
 void matexit(void(*)(void*), void*);
+void delProgram(void* arg);
+void delTexture(void* arg);
+void delBuffer(void* arg);
 
 void gtick(gstate*);
 void gdisplay(gstate*);
@@ -114,14 +121,25 @@ PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 PFNGLGETTEXTURESUBIMAGEPROC glGetTextureSubImage;
 PFNGLGETTEXTUREIMAGEPROC glGetTextureImage;
 PFNGLUNIFORM1FPROC glUniform1f;
+PFNGLUNIFORM4FPROC glUniform4f;
+PFNGLUNIFORM1FVPROC glUniform1fv;
+PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORM4IPROC glUniform4i;
+PFNGLUNIFORM1IVPROC glUniform1iv;
+PFNGLUNIFORM4IVPROC glUniform4iv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLDELETESHADERPROC glDeleteShader;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
+PFNGLVERTEXATTRIBPOINTERARBPROC glVertexAttribPointer;
+PFNGLENABLEVERTEXATTRIBARRAYARBPROC glEnableVertexAttribArray;
+PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBUFFERDATAPROC glBufferData;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 
-
-GLuint compileComputeShader(const u8*);
-GLuint compilePipeline(const u8*);
+GLuint compileComputeShader(const u8*, u32);
+GLuint compilePipeline(const u8*, u32);
 GLuint makeTax(u32 w, u32 h, GLint mip, GLenum format, GLenum type);
 
 #ifdef _DEBUG
