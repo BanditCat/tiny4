@@ -21,8 +21,8 @@ layout(triangle_strip, max_vertices = 3) out;
 in vec4 vcolor[3];
 out vec4 color;
 
-void main() {
-  for(int i = 0; i < 3; i++) {
+void main(){
+  for(int i = 0; i < 3; i++){
     gl_Position = gl_in[i].gl_Position;
 	color = vcolor[i];
     EmitVertex();

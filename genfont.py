@@ -1,30 +1,32 @@
-letter = [[ 0,1,1,1,0 ],
-	    [ 0,0,0,0,1 ],
-          [ 0,1,1,1,1 ],
-          [ 1,0,0,0,1 ],
-          [ 0,1,1,1,1 ],
-          [ 0,0,0,0,0 ],
-          [ 0,0,0,0,0 ]]
+from PIL import Image
 
-f = open( "font.txt", "w" )
-f.write( "test" )
-f.close()
-i = 0;
-for x in range(4):
+img = Image.open("font.png")
+max = 95
+
+mstr = 'GLuint font[95*2] = {'
+for l in range(max):
+	i = 0;
+	for x in range(4):
+		c = 1
+		i *= 256
+		for y in range(7):
+			r, g, b = img.getpixel((3-x,l*8+6-y))
+			if b == 0:
+				i += c
+			c *= 2
+	mstr += str(i) + ","
 	c = 1
-	i *= 256
+	i = 0
 	for y in range(7):
-		if letter[6-y][3-x] == 1:
+		r, g, b = img.getpixel((4,l*8+6-y))
+		if b == 0:
 			i += c
 		c *= 2
-print(i)
-c = 1
-i = 0
-for y in range(7):
-	if letter[6-y][4] == 1:
-		i += c
-	c *= 2
-print(i)
+	if l == max-1:
+		mstr += str(i) + "};"
+	else:
+		mstr += str(i) + ","
 
+print(mstr)
 	
 

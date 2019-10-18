@@ -1,0 +1,9 @@
+font and string as tex
+
+Atomics for fire
+
+Text to texture
+
+String in buffer for ^^^
+
+move screentex into dll, what doesnt need a screentex?
