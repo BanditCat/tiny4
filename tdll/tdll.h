@@ -10,7 +10,7 @@
 #include "wglext.h"
 
 __declspec(dllexport) int _fltused;
-__declspec(dllexport) HWND setup ( HMODULE, HICON, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags );
+__declspec(dllexport) HWND setup( HMODULE, HICON, HINSTANCE hinst, char* title, int x, int y, int width, int height, BYTE type, DWORD flags );
 
 #ifdef _DEBUG
 #define say(X) MessageBoxA(NULL,X,"test",0)
@@ -26,8 +26,8 @@ __declspec(dllexport) HWND setup ( HMODULE, HICON, HINSTANCE hinst, char* title,
 
 
 
-void mexit ( void );
-const u8* getResource ( u32 id, u32* sz );
+void mexit( void );
+const u8* getResource( u32 id, u32* sz );
 
 
 typedef struct gstate {
@@ -90,15 +90,15 @@ typedef struct gstate {
   int _tobreak;
 } gstate;
 
-void matexit ( void(*)(void*), void* );
-void delProgram ( void* arg );
-void delTexture ( void* arg );
-void delBuffer ( void* arg );
+void matexit( void(*)(void*), void* );
+void delProgram( void* arg );
+void delTexture( void* arg );
+void delBuffer( void* arg );
 
-void gtick ( gstate* );
-void gdisplay ( gstate* );
-void genter ( gstate* );
-void gexit ( gstate* );
+void gtick( gstate* );
+void gdisplay( gstate* );
+void genter( gstate* );
+void gexit( gstate* );
 
 
 
@@ -139,9 +139,9 @@ PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 
-GLuint compileComputeShader ( const u8*, u32 );
-GLuint compilePipeline ( const u8*, u32 );
-GLuint makeTax ( u32 w, u32 h, GLint mip, GLenum format, GLenum type );
+GLuint compileComputeShader( const u8*, u32 );
+GLuint compilePipeline( const u8*, u32 );
+GLuint makeTax( u32 w, u32 h, GLint mip, GLenum format, GLenum type );
 
 #ifdef _DEBUG
 #define loadGl( Y, X ){ void* ret; ret = X = (Y)wglGetProcAddress(#X); if (ret == NULL){ say("FAILED " #X); mexit(); } }
