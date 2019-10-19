@@ -1,4 +1,13 @@
-﻿  tdll.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Release\tdll.dll
-  Input file size: 20448; Compressed Size: 10372
+﻿  dllmain.c
+  game.c
+cl : command line warning D9025: overriding '/sdl-' with '/GS-'
+LINK : warning LNK4108: /ALIGN specified without /DRIVER; image may not run
+     Creating library C:\Users\bcj19\source\repos\tiny4\x64\Release\tdll.lib and object C:\Users\bcj19\source\repos\tiny4\x64\Release\tdll.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 22 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  tdll.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Release\tdll.dll
+  Input file size: 21376; Compressed Size: 10782
   Compression Time(Exclude I/O): 0.02 seconds
   File Compressed.

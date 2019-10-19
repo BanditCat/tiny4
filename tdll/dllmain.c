@@ -563,6 +563,10 @@ GLuint makeTex( u32 w, u32 h, GLint mip, GLenum intFormat, const void* data ){
     format = GL_RED_INTEGER;
     type = GL_UNSIGNED_BYTE;
     break;
+  case GL_R32UI:
+    format = GL_RED_INTEGER;
+    type = GL_UNSIGNED_INT;
+    break;
   }
 
   glTexImage2D( GL_TEXTURE_2D, 0, intFormat, w, h, 0, format, type, data );

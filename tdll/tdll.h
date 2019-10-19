@@ -28,7 +28,7 @@ __declspec(dllexport) HWND setup( HMODULE, HICON, HINSTANCE hinst, char* title, 
 
 void mexit( void );
 const u8* getResource( u32 id, u32* sz );
-
+u32 mrand( void );
 
 typedef struct gstate {
   // Wininfo

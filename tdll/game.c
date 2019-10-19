@@ -5,7 +5,9 @@ typedef struct {
   GLuint screenTex;
   GLuint fontTex;
   GLuint stringTex;
-  GLuint stringTextWidth, stringTextHeight;
+  GLuint stringTexWidth, stringTexHeight;
+  u32* theMatrix;
+  GLuint matrixTex;
   GLuint pipeline;
   GLuint quadBuf;
   GLuint compute;
@@ -17,7 +19,10 @@ void genter( gstate* state ){
   // dimensions of the image
 
   checkGlErrors( "sab" );
-  game.stringTextWidth = ((state->screenWidth / 6) / 8) * 8 + 16; game.stringTextHeight = ((state->screenHeight / 8) / 8) * 8 + 16;
+  game.stringTexWidth = ((state->screenWidth / 6) / 8) * 8 + 16; game.stringTexHeight = ((state->screenHeight / 8) / 8) * 8 + 16;
+  game.theMatrix = malloc( sizeof( u32 ) * game.stringTexWidth );
+  memset( game.theMatrix, 0, sizeof( u32 ) * game.stringTexWidth );
+
   game.stWidth = state->screenWidth + 32;
   game.stHeight = state->screenHeight + 32;
   game.screenTex = makeTex( game.stWidth, game.stHeight, GL_NEAREST, GL_RGBA8, NULL );
@@ -50,11 +55,14 @@ void genter( gstate* state ){
   glUseProgram( game.compute );
 
 
-  const u8* msg = "The quick brown fox Jumped over the lazy black dog. The Quick Brown Fox Jumped Over The Lazy Black Dog;	u32 msz = strlen(msg);	u32 * msgi = malloc(sizeof(u32) * msz);	for (u32 i = 0; i < msz; ++i)	msgi[i] = msg[i];	glUniform1i(2, msz);glUniform1iv(3, msz / 4 + 1, msg);";
+  const u8* msg = "The quick brown fox Jumped over the lazy black dog. The Quick Brown Fox Jumped Over The Lazy Black Dog;	u32 msz = strlen(msg);	u32 * msgi = malloc(sizeof(u32) * msz);	for (u32 i = 0; i < msz; ++i)	msgi[i] = msg[i];	glUniform1i(2, msz);glUniform1iv(3, msz / 4 + 1, msg);ENDENDENDEND";
   u32 msz = (u32)strlen( msg );
   glUniform1i( 2, msz );
 
-  game.stringTex = makeTex( game.stringTextWidth, msz / game.stringTextWidth + 1, GL_NEAREST, GL_R8UI, msg );
+  game.stringTex = makeTex( game.stringTexWidth, msz / game.stringTexWidth + 1, GL_NEAREST, GL_R8UI, msg );
+  
+  game.matrixTex = makeTex( game.stringTexWidth, 1, GL_NEAREST, GL_R32UI, game.theMatrix );
+
 
   glActiveTexture( GL_TEXTURE0 );
   glBindTexture( GL_TEXTURE_2D, game.screenTex );
@@ -68,6 +76,10 @@ void genter( gstate* state ){
   glBindTexture( GL_TEXTURE_2D, game.stringTex );
   glBindImageTexture( 3, game.stringTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI );
   glUniform1i( 4, 3 );
+  glActiveTexture( GL_TEXTURE3 );
+  glBindTexture( GL_TEXTURE_2D, game.matrixTex );
+  glBindImageTexture( 1, game.matrixTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32UI );
+  glUniform1i( 6, 1 );
 
   //glUniform1iv( 5000, 95 * 2, font );
 
@@ -87,9 +99,8 @@ void genter( gstate* state ){
   glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, 0, NULL );
 }
 void gexit( gstate* state ){
-
-
-}
+  free( game.theMatrix );
+ }
 void gtick( gstate* state ){
   if(state->keys[VK_ESCAPE]){
     mexit();
@@ -110,19 +121,31 @@ void gtick( gstate* state ){
       ShowWindow( state->hWnd, SW_SHOW );
     }
   }
+  static u64 matd = 0;
+  while( matd < state->seconds * 1000 ){
+    for( u32 i = 0; i < game.stringTexWidth / 32; ++i ){
+      u32 d = mrand() % game.stringTexWidth;
+      game.theMatrix[ d ]++;
+      if( mrand() % 100 == 0 )
+        game.theMatrix[d] = 0;
+    }
+    ++matd;
+  }
 }
 void gdisplay( gstate* state ){
   glClear( GL_COLOR_BUFFER_BIT );
   glUseProgram( game.compute );
   u32 tilesX = state->clientWidth / 32 + 1;
   u32 tilesY = state->clientHeight / 32 + 1;
-  static u32 n = 0;
-  glActiveTexture( GL_TEXTURE2 );
-  glBindTexture( GL_TEXTURE_2D, game.stringTex );
-  ++n;
-  //glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_BYTE, &n );
+
+  glActiveTexture( GL_TEXTURE3 );
+  glBindTexture( GL_TEXTURE_2D, game.matrixTex );
+
+  checkGlErrors( "123" );
+  glTexImage2D( GL_TEXTURE_2D, 0, GL_R32UI, game.stringTexWidth, 1, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, game.theMatrix );
+  checkGlErrors( "122" );
   glUniform4f( 1, (float)state->clientWidth, (float)state->clientHeight, (float)state->clientWidth / game.stWidth, (float)state->clientHeight / game.stHeight );
-  glUniform4i( 5, game.stringTextWidth, game.stringTextHeight, 0, 0 );
+  glUniform4i( 5, game.stringTexWidth, game.stringTexHeight, 0, 0 );
 
   glDispatchCompute( tilesX, tilesY, 1 );
   glUseProgram( game.pipeline );
