@@ -534,7 +534,7 @@ GLuint compilePipeline( const u8* src, u32 sz ){
   checkGlErrors( "compilePipeline" );
   return ret;
 }
-GLuint makeTax( u32 w, u32 h, GLint mip, GLenum format, GLenum type ){
+GLuint makeTex( u32 w, u32 h, GLint mip, GLenum intFormat, const void* data ){
   GLuint ret;
   glGenTextures( 1, &ret );
   matexit( delTexture, (void*)ret );
@@ -547,6 +547,25 @@ GLuint makeTax( u32 w, u32 h, GLint mip, GLenum format, GLenum type ){
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mip );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mip );
   }
-  glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, format, type, NULL );
+  checkGlErrors( "makeTex" );
+  GLenum format, type;
+
+  switch( intFormat ){
+  case GL_RGBA32F:
+    format = GL_RGBA;
+    type = GL_FLOAT;
+    break;
+  case GL_RGBA8:
+    format = GL_RGBA;
+    type = GL_UNSIGNED_BYTE;
+    break;
+  case GL_R8UI:
+    format = GL_RED_INTEGER;
+    type = GL_UNSIGNED_BYTE;
+    break;
+  }
+
+  glTexImage2D( GL_TEXTURE_2D, 0, intFormat, w, h, 0, format, type, data );
+ checkGlErrors( "makeTex post" );
   return ret;
 }

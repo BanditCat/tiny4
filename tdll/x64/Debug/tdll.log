@@ -1,15 +1,5 @@
-﻿  dllmain.c
-  game.c
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(19,95): warning C4020: 'makeTax': too many actual parameters
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(38,38): warning C4133: 'function': incompatible types - from 'const u8 *' to 'const GLint *'
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(33,1): warning C4267: 'initializing': conversion from 'size_t' to 'u32', possible loss of data
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(87,38): warning C4244: 'function': conversion from 'u32' to 'GLfloat', possible loss of data
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(87,59): warning C4244: 'function': conversion from 'u32' to 'GLfloat', possible loss of data
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(90,38): warning C4244: 'function': conversion from 'u32' to 'GLfloat', possible loss of data
-  Generating Code...
-C:\Users\bcj19\source\repos\tiny4\tdll\game.c(90,59): warning C4244: 'function': conversion from 'u32' to 'GLfloat', possible loss of data
-     Creating library C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.lib and object C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.exp
+﻿     Creating library C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.lib and object C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.exp
   tdll.vcxproj -> C:\Users\bcj19\source\repos\tiny4\x64\Debug\tdll.dll
-  Input file size: 91648; Compressed Size: 20648
+  Input file size: 92672; Compressed Size: 21082
   Compression Time(Exclude I/O): 0.03 seconds
   File Compressed.

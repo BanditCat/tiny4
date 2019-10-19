@@ -141,7 +141,7 @@ PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 
 GLuint compileComputeShader( const u8*, u32 );
 GLuint compilePipeline( const u8*, u32 );
-GLuint makeTax( u32 w, u32 h, GLint mip, GLenum format, GLenum type );
+GLuint makeTex( u32 w, u32 h, GLint mip, GLenum format, const void* data );
 
 #ifdef _DEBUG
 #define loadGl( Y, X ){ void* ret; ret = X = (Y)wglGetProcAddress(#X); if (ret == NULL){ say("FAILED " #X); mexit(); } }
