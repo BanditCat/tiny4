@@ -21,7 +21,8 @@ void genter( gstate* state ){
   checkGlErrors( "sab" );
   game.stringTexWidth = ((state->screenWidth / 6) / 8) * 8 + 16; game.stringTexHeight = ((state->screenHeight / 8) / 8) * 8 + 16;
   game.theMatrix = malloc( sizeof( u32 ) * game.stringTexWidth );
-  memset( game.theMatrix, 0, sizeof( u32 ) * game.stringTexWidth );
+  for(u32 i = 0; i < game.stringTexWidth; ++i)
+    game.theMatrix[i] = mrand() % 1000;
 
   game.stWidth = state->screenWidth + 32;
   game.stHeight = state->screenHeight + 32;
@@ -126,7 +127,7 @@ void gtick( gstate* state ){
     for( u32 i = 0; i < game.stringTexWidth / 32; ++i ){
       u32 d = mrand() % game.stringTexWidth;
       game.theMatrix[ d ]++;
-      if( mrand() % 100 == 0 )
+      if( mrand() % 100 == 0 && game.theMatrix[d] > 300 )
         game.theMatrix[d] = 0;
     }
     ++matd;

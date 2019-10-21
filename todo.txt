@@ -1,4 +1,4 @@
-font and string as tex
+Move apropraite stuff into dllmain.c
 
 Atomics for fire
 
