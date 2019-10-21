@@ -181,7 +181,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="compute.glsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
       <FileType>Document</FileType>
     </Text>
     <ClCompile Include="dllmain.c" />

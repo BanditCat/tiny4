@@ -7,3 +7,5 @@ Text to texture
 String in buffer for ^^^
 
 move screentex into dll, what doesnt need a screentex?
+
+So I have to choose either penumbral wedges or a non polygonal compute based approach. Neither are ameanable to raytracing, I'd have to tack that on after. For non-polygonal I want to do a compute shader 2d/3d voxel engine ala delta force. Imagine how many voxel landscapes a 2070 could do. Enough for a sprite engine.
