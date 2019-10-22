@@ -299,8 +299,6 @@ __declspec(dllexport) HWND setup( HMODULE ll, HICON hi, HINSTANCE hinst, char* t
 
   state->hDC = GetDC( state->hWnd );
 
-  /* there is no guarantee that the contents of the stack that become
-     the pfd are zeroed, therefore _make sure_ to clear these bits. */
   memset( &state->pfd, 0, sizeof( state->pfd ) );
   state->pfd.nSize = sizeof( state->pfd );
   state->pfd.nVersion = 1;
@@ -360,6 +358,7 @@ __declspec(dllexport) HWND setup( HMODULE ll, HICON hi, HINSTANCE hinst, char* t
   loadGl( PFNGLBINDBUFFERPROC, glBindBuffer );
   loadGl( PFNGLBUFFERDATAPROC, glBufferData );
   loadGl( PFNGLDELETEBUFFERSPROC, glDeleteBuffers );
+  loadGl( PFNGLBINDBUFFERBASEPROC, glBindBufferBase );
 
 
 

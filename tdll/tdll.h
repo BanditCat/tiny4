@@ -138,6 +138,7 @@ PFNGLGENBUFFERSPROC glGenBuffers;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 
 GLuint compileComputeShader( const u8*, u32 );
 GLuint compilePipeline( const u8*, u32 );

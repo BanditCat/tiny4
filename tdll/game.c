@@ -2,6 +2,7 @@
 
 
 typedef struct {
+  GLuint atomic;
   GLuint screenTex;
   GLuint fontTex;
   GLuint stringTex;
@@ -11,6 +12,7 @@ typedef struct {
   GLuint pipeline;
   GLuint quadBuf;
   GLuint compute;
+  GLuint msec;
   u32 stWidth, stHeight;
 } sgame;
 sgame game;
@@ -19,6 +21,7 @@ void genter( gstate* state ){
   // dimensions of the image
 
   checkGlErrors( "sab" );
+  game.msec = 0;
   game.stringTexWidth = ((state->screenWidth / 6) / 8) * 8 + 16; game.stringTexHeight = ((state->screenHeight / 8) / 8) * 8 + 16;
   game.theMatrix = malloc( sizeof( u32 ) * game.stringTexWidth );
   for(u32 i = 0; i < game.stringTexWidth; ++i)
@@ -98,6 +101,15 @@ void genter( gstate* state ){
   glBufferData( GL_ARRAY_BUFFER, 64, arr, GL_STATIC_DRAW );
   glEnableVertexAttribArray( 1 );
   glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, 0, NULL );
+
+
+  GLuint *arr2 = malloc( sizeof( GLuint ) * 1024 );;
+  glGenBuffers( 1, &game.atomic );
+  matexit( delBuffer, (void*)game.atomic );
+  glBindBuffer( GL_ATOMIC_COUNTER_BUFFER, game.atomic );
+  glBufferData( GL_ATOMIC_COUNTER_BUFFER, 4, arr2, GL_DYNAMIC_DRAW );
+  free( arr2 );
+  glBindBufferBase( GL_ATOMIC_COUNTER_BUFFER, 0, game.atomic );
 }
 void gexit( gstate* state ){
   free( game.theMatrix );
@@ -123,14 +135,14 @@ void gtick( gstate* state ){
     }
   }
   static u64 matd = 0;
-  while( matd < state->seconds * 1000 ){
+  while( game.msec < state->seconds * 1000 ){
     for( u32 i = 0; i < game.stringTexWidth / 32; ++i ){
       u32 d = mrand() % game.stringTexWidth;
       game.theMatrix[ d ]++;
       if( mrand() % 100 == 0 && game.theMatrix[d] > 300 )
         game.theMatrix[d] = 0;
     }
-    ++matd;
+    ++game.msec;
   }
 }
 void gdisplay( gstate* state ){
@@ -147,6 +159,7 @@ void gdisplay( gstate* state ){
   checkGlErrors( "122" );
   glUniform4f( 1, (float)state->clientWidth, (float)state->clientHeight, (float)state->clientWidth / game.stWidth, (float)state->clientHeight / game.stHeight );
   glUniform4i( 5, game.stringTexWidth, game.stringTexHeight, 0, 0 );
+  glUniform1i( 7, game.msec );
 
   glDispatchCompute( tilesX, tilesY, 1 );
   glUseProgram( game.pipeline );
