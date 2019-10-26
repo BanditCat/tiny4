@@ -27,7 +27,7 @@ uint hash( uvec2 v ) { return hash( v.x ^ hash(v.y) ); }
 
 void main(){
   ivec2 index = ivec2( gl_GlobalInvocationID.xy );
-  ivec2 pindex = index / 2;
+  ivec2 pindex = index / 1;
   pindex.y += pindex.x / 6;
   uint param = imageLoad( matrixTex, ivec2( pindex.x / 6, 0 ) ).x;
   float hparm = float( 400 - param ) / 100.0 - float(pindex.y / 8) / ( 0.5 * txtSize.y );
@@ -62,8 +62,8 @@ void main(){
   uint h = hash( gl_GlobalInvocationID.xy + ivec2( msec * 1024, msec * 1024 ) );
   int x = int( ( ( h >> 14 ) & 16383 ) % int( span.x ) );
   int y = int( ( h & 16383 ) % int( span.y ) );
-  int x2 = x + ( int( h >> 28 & 7 ) - 3 ) ;
-  int y2 = y + 5;
+  int x2 = x + ( int( h >> 28 & 3 ) - 1 ) ;
+  int y2 = y + ( int( h >> 30 & 3 ) + 2 ) ;
   ivec2 xy = ivec2( x, y );
   ivec2 xy2 = ivec2( x2, y2 );
   vec4 lp4 = imageLoad( destTex, xy );

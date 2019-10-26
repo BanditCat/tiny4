@@ -4,29 +4,29 @@
   
    Directory of C:\Users\bcj19\source\repos\tiny4\x64\Debug
   
-  10/21/2019  08:15 PM    <DIR>          .
-  10/21/2019  08:15 PM    <DIR>          ..
-  10/21/2019  08:15 PM            21,543 main.obj
-  10/21/2019  08:15 PM            22,198 tdll.comp
-  10/21/2019  08:15 PM            96,768 tdll.dll
-  10/21/2019  08:15 PM               799 tdll.exp
-  10/21/2019  08:15 PM           545,380 tdll.ilk
-  10/21/2019  08:15 PM             1,792 tdll.lib
-  10/21/2019  08:15 PM           454,656 tdll.pdb
-  10/21/2019  08:15 PM            64,512 tdllcompress.exe
-  10/21/2019  08:15 PM           429,568 tdllcompress.ilk
-  10/21/2019  08:15 PM           430,080 tdllcompress.pdb
-  10/21/2019  08:15 PM             1,513 tiny4.Build.CppClean.log
-  10/21/2019  08:15 PM            75,264 tiny4.exe
-  10/21/2019  08:15 PM               752 tiny4.exp
-  10/21/2019  08:15 PM           271,464 tiny4.ilk
-  10/21/2019  08:15 PM             1,686 tiny4.lib
-  10/21/2019  08:15 PM                 0 tiny4.log
-  10/21/2019  08:15 PM           356,352 tiny4.pdb
-  10/21/2019  08:15 PM            23,020 tiny4.res
-  10/21/2019  08:15 PM    <DIR>          tiny4.tlog
-  10/21/2019  08:15 PM                 0 tiny4.vcxproj.FileListAbsolute.txt
-  10/21/2019  08:15 PM           224,256 vc142.idb
-  10/21/2019  08:15 PM           102,400 vc142.pdb
-                21 File(s)      3,124,003 bytes
-                 3 Dir(s)  69,781,622,784 bytes free
+  10/23/2019  02:00 PM    <DIR>          .
+  10/23/2019  02:00 PM    <DIR>          ..
+  10/22/2019  12:32 PM            21,543 main.obj
+  10/23/2019  02:00 PM            22,208 tdll.comp
+  10/23/2019  02:00 PM            96,768 tdll.dll
+  10/23/2019  02:00 PM               799 tdll.exp
+  10/23/2019  02:00 PM           545,380 tdll.ilk
+  10/22/2019  12:32 PM             1,792 tdll.lib
+  10/23/2019  02:00 PM           454,656 tdll.pdb
+  10/23/2019  02:00 PM            64,512 tdllcompress.exe
+  10/23/2019  02:00 PM           429,568 tdllcompress.ilk
+  10/23/2019  02:00 PM           430,080 tdllcompress.pdb
+  10/22/2019  12:32 PM             1,513 tiny4.Build.CppClean.log
+  10/23/2019  02:00 PM            75,264 tiny4.exe
+  10/22/2019  12:32 PM               752 tiny4.exp
+  10/23/2019  02:00 PM           271,464 tiny4.ilk
+  10/22/2019  12:32 PM             1,686 tiny4.lib
+  10/23/2019  02:00 PM                 0 tiny4.log
+  10/23/2019  02:00 PM           356,352 tiny4.pdb
+  10/23/2019  02:00 PM            23,028 tiny4.res
+  10/23/2019  02:00 PM    <DIR>          tiny4.tlog
+  10/22/2019  12:32 PM                 0 tiny4.vcxproj.FileListAbsolute.txt
+  10/22/2019  12:32 PM           224,256 vc142.idb
+  10/22/2019  12:32 PM           102,400 vc142.pdb
+                21 File(s)      3,124,021 bytes
+                 3 Dir(s)  71,066,210,304 bytes free
